@@ -11,8 +11,8 @@ function add_mqtt_listener(topic, message_callback) {
     let cliid = "OVM_" + parseInt(Math.random() * 100, 10) + "_plus";
 
     if (typeof topic === 'undefined') {
-        console.warn(lp + "topic undefined!");
         topic = MQTT_TOPIC_NAMESPACE + '/*';
+        console.warn(lp + "topic undefined, using '" + topic + "'!");
     }
     let url = new URI(window.location);
     let ws_scheme = url.scheme() == 'https' ? 'wss' : 'ws';
@@ -138,8 +138,23 @@ function callback_device_message(message) {
     }
 }
 
+function callback_device_humidity(message) {
+    let data = JSON.parse(message.payloadString);
+
+    console.info(message.topic + " [any humidity sensor] -- " + data.data);
+}
+
+function callback_ix40_device(message) {
+    let data = JSON.parse(message.payloadString);
+
+    console.warn("[iX40-SPECIAL] -- " + data.data);
+}
+
 function on_status_dog_loaded() {
-    add_mqtt_listener();
+    add_mqtt_listener("ix/humidity/*", callback_device_humidity); // subscribe to any 'humidity' sensor
+
+    add_mqtt_listener("ix/humidity/ix40", callback_ix40_device); // subscribe to any 'humidity' sensor data of the 'ix40' device only
+
     add_mqtt_listener("ix/register", callback_device_register);
     add_mqtt_listener("ix/message", callback_device_message);
 }
