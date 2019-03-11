@@ -16,7 +16,7 @@ MQTT_TOPIC_NAMESPACE = 'ix'
 MQTT_SUB_TOPIC = 'ix'
 
 
-def pub(payload, sub_topic=None):
+def pub(payload, sub_topic=None, auth=None):
     if sub_topic is None:
         sub_topic = MQTT_SUB_TOPIC
 
@@ -26,5 +26,5 @@ def pub(payload, sub_topic=None):
         payload = json.dumps(payload)
 
     publish.single(topic, payload=payload,
-                   hostname=MQTT_HOST, port=MQTT_PORT)
+                   hostname=MQTT_HOST, port=MQTT_PORT, auth=auth)
     return dict(topic=topic, payload=payload)

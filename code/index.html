@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ix-rabbit</title>
+    <link rel="stylesheet" href="/static/css/ix-rabbit.css" type="text/css" />
+</head>
+<body>
+<script src="/static/jquery-3.3.1.min.js"></script>
+<script src="/static/paho-mqtt.js"></script>
+<script src="/static/URI.min.js"></script>
+<script src="mqtt_glue.js"></script>
+<script>
+    $(document).ready(function () {
+        console.log("ready!");
+        on_status_dog_loaded();
+    });
+</script>
+
+<section id="devices">
+    <h1>devices</h1>
+    <ol id="device_list">
+    </ol>
+    <div id="devices_placeholder" class="placeholder">None, YET ...</div>
+</section>
+
+<section id="messages">
+    <h1>messages</h1>
+    <ul id="message_list">
+    </ul>
+    <div id="messages_placeholder" class="placeholder">None, YET ...</div>
+</section>
+
+</body>
+</html>

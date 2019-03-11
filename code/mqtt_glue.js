@@ -3,6 +3,9 @@ const MQTT_WS_PORT = 15675;
 const MQTT_TOPIC_NAMESPACE = 'ix';
 const XHR_TIMEOUT = 1000;
 
+const MQTT_PASSWORD = "mqtt-test";
+const MQTT_USERNAME = "mqtt-test";
+
 function add_mqtt_listener(topic, message_callback) {
     const lp = '[add_mqtt_listener] ';
     let cliid = "OVM_" + parseInt(Math.random() * 100, 10) + "_plus";
@@ -14,12 +17,6 @@ function add_mqtt_listener(topic, message_callback) {
     let url = new URI(window.location);
     let ws_scheme = url.scheme() == 'https' ? 'wss' : 'ws';
     let ws_host = url.host();
-
-    if (get_url_parameter("ws") !== "relative") {
-        if ((url.hostname() == 'localhost') || (url.hostname() == '127.0.0.1')) {
-            ws_host = '10.11.12.1';
-        }
-    }
 
     let ws_url = new URI(ws_scheme + '://' + ws_host + '/ws');
     console.info("Determining WebSocket URL: " + url.toString() + " -> " + ws_url.toString());
@@ -80,13 +77,15 @@ function add_mqtt_listener(topic, message_callback) {
         };
     }
     else {
-        console.debug(lp + "Using custom message callback");
+        console.debug(lp + "Using custom message callback for '" + topic + "'");
         client.onMessageArrived = message_callback;
     }
 
     let connect_options = {
         "onSuccess": onConnect,
-        "keepAliveInterval": 15
+        "keepAliveInterval": 15,
+        "userName": MQTT_USERNAME,
+        "password": MQTT_PASSWORD
     };
 
     client.onConnectionLost = function (responseObject) {
@@ -110,9 +109,37 @@ function add_mqtt_listener(topic, message_callback) {
     }
 }
 
+function callback_device_register(message) {
+    let data = JSON.parse(message.payloadString);
+
+    console.info(message.topic + ":");
+    console.info(JSON.stringify(data, null, 2));
+
+    $('#devices_placeholder').hide();
+    $('#device_list').append('<li>' + data.device_id + '</li>');
+}
+
+function callback_device_message(message) {
+    let data = JSON.parse(message.payloadString);
+
+    console.info(message.topic + ":");
+    console.info(JSON.stringify(data, null, 2));
+
+    $('#messages_placeholder').hide();
+    let device_id = data.device_id;
+    let mfg = data.data;
+    let message_container_id = 'mfg_' + device_id;
+
+    if ($('#' + message_container_id).length == 0) {
+        $('#message_list').append('<li class="device_message" id="' + message_container_id + '"><div class="device_id">' + device_id + ':</div><div class="message">' + mfg + '</div></li>');
+    }
+    else {
+        $('#' + message_container_id + '> div.message').html(mfg);
+    }
+}
+
 function on_status_dog_loaded() {
-
     add_mqtt_listener();
-
-    // add_mqtt_listener(MQTT_TOPIC_NAMESPACE + "/x");
+    add_mqtt_listener("ix/register", callback_device_register);
+    add_mqtt_listener("ix/message", callback_device_message);
 }
