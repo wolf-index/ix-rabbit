@@ -1,7 +1,16 @@
 ix rabbit
 =========
 
-Minimal pub/sub demonstration using https://www.rabbitmq.com/ as MQTT broker with WebSocket plugin.
+Minimal publish/subscribe demonstration using `RabbitMQ <https://www.rabbitmq.com/>`_ as MQTT broker with WebSocket
+plugin.
+
+Modus Operandi
+--------------
+
+RabbitMQ is acting as a `MQTT <https://en.wikipedia.org/wiki/MQTT>`_ Broker (`localhost:1883`) also allowing access via
+WebSocket (`localhost:15675`) for web clients.
+The `Eclipse paho <https://www.eclipse.org/paho/>`_ provides open-source client implementations of MQTT
+messaging protocol.
 
 Prerequisites
 -------------
@@ -9,6 +18,7 @@ Prerequisites
 Checkout repository *including* submodules:
 
     git clone --recursive -j4 --depth 1 https://github.com/wolf-index/ix-rabbit
+
 
 RabbitMQ
 ++++++++
@@ -33,6 +43,6 @@ python environment
 Running
 -------
 
-# Point your browser to `http://localhost/index.html <http://localhost/index.html>`_
-# Run `code/fake_devices.py`
-# PROFIT.
+* Point your browser to `http://localhost/index.html <http://localhost/index.html>`_
+* Run `code/fake_devices.py`
+* PROFIT (device IDs and messages should be appearing in the browser window).
