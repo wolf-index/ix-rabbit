@@ -15,6 +15,11 @@ MQTT_TOPIC_NAMESPACE = 'ix'
 
 MQTT_SUB_TOPIC = 'ix'
 
+# see https://www.rabbitmq.com/mqtt.html
+MQTT_AUTH = {
+    'username': "mqtt-test",
+    'password': "mqtt-test"
+}
 
 def pub(payload, sub_topic=None, auth=None):
     if sub_topic is None:

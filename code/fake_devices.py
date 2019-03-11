@@ -5,12 +5,7 @@ import time
 import random
 
 import mqtt_glue
-
-# see https://www.rabbitmq.com/mqtt.html
-MQTT_AUTH = {
-    'username': "mqtt-test",
-    'password': "mqtt-test"
-}
+from mqtt_glue import MQTT_AUTH
 
 MESSAGES = [
     "There may be honor among thieves, but there's none in politicians.",
