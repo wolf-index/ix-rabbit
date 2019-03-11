@@ -1,0 +1,6 @@
+[submodule "static/dry/URI.js"]
+	path = static/dry/URI.js
+	url = ssh://github.com/medialize/URI.js
+[submodule "static/dry/paho"]
+	path = static/dry/paho
+	url = git@github.com:eclipse/paho.mqtt.javascript.git
