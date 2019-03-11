@@ -33,6 +33,6 @@ python environment
 Running
 -------
 
-    # Point your browser to `http://localhost/index.html <http://localhost/index.html>`_
-    # Run `code/fake_devices.py`
-    # PROFIT.
+# Point your browser to `http://localhost/index.html <http://localhost/index.html>`_
+# Run `code/fake_devices.py`
+# PROFIT.
