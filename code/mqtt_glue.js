@@ -20,7 +20,7 @@ function add_mqtt_listener(topic, message_callback) {
 
     let ws_url = new URI(ws_scheme + '://' + ws_host + '/ws');
     console.info("Determining WebSocket URL: " + url.toString() + " -> " + ws_url.toString());
-    var client = new Paho.Client(ws_url.toString(), cliid);
+    let client = new Paho.Client(ws_url.toString(), cliid);
 
     // add_toaster("WebSocket", ws_url.toString());
 
@@ -107,6 +107,8 @@ function add_mqtt_listener(topic, message_callback) {
         // message.destinationName = "World";
         // client.send(message);
     }
+
+    return client;
 }
 
 function callback_device_register(message) {
