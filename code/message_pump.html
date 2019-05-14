@@ -47,7 +47,7 @@
         let alerts_selector = ni_selector.find('div.alert');
         let alerts_threshold = 9;
 
-        if(alerts_selector.length > alerts_threshold) {
+        if (alerts_selector.length > alerts_threshold) {
             alerts_selector.slice(alerts_threshold).remove();
         }
 
@@ -71,7 +71,7 @@
                 "kind": "warning"
             };
 
-            if(false === data.error.may_try_again) {
+            if (false === data.error.may_try_again) {
                 args["kind"] = "danger"
             }
         }
@@ -176,67 +176,62 @@
     });
 </script>
 
-<section id="message_pump">
-    <div class="container">
-        <div class="row">
-            <h1>Message Pump Demo</h1>
-        </div>
+<section id="message_pump" class="container">
+    <div class="d-flex justify-content-center">
+        <form id="foermchen" method="post" action="/message_pump.html">
+            <div id="request_form_container">
+                <h1>Message Pump Demo</h1>
 
-        <div class="row">
-            <form id="foermchen" method="post" action="/message_pump.html">
-                <div class="col-md-12">
-                    <div class="input-group">
-                        <input id="url" type="text" class="form-control"
-                               placeholder="http://bla.org"
-                               value="http://example.com"
-                               data-toggle="tooltip" data-placement="left" title="Tooltip on right"
-                        >
+                <div class="input-group">
+                    <input id="url" type="text" class="form-control"
+                           placeholder="http://bla.org"
+                           value="http://example.com"
+                           data-toggle="tooltip" data-placement="top" title="Tooltip on right"
+                    >
 
-                        <div class="input-group-append">
-                            <input id="gimme" type="submit"
-                                   class="btn btn-primary"
-                                   value="gimme">
-                        </div>
+                    <div class="input-group-append">
+                        <input id="gimme" type="submit"
+                               class="btn btn-primary"
+                               value="gimme">
                     </div>
                 </div>
+
                 <hr>
-                <div class="col-md-12">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input"
-                               id="email_notification">
-                        <label class="custom-control-label"
-                               for="email_notification">Send email if
-                            ...</label>
-                    </div>
 
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input"
-                               id="keep_override_value">
-                        <label class="custom-control-label"
-                               for="keep_override_value">Keep override
-                            value...</label>
-                    </div>
-
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input"
-                               id="auto_download">
-                        <label class="custom-control-label"
-                               for="auto_download">Download</label>
-                    </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input"
+                           id="email_notification">
+                    <label class="custom-control-label"
+                           for="email_notification">Send email if
+                        ...</label>
                 </div>
+
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input"
+                           id="keep_override_value">
+                    <label class="custom-control-label"
+                           for="keep_override_value">Keep override
+                        value...</label>
+                </div>
+
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input"
+                           id="auto_download">
+                    <label class="custom-control-label"
+                           for="auto_download">Download</label>
+                </div>
+
                 <hr>
-                <div class="col-md-12">
-                    <h4>Overrides <span class="text-muted">(Optional)</span>
-                    </h4>
-                    <div class="mb-3">
-                        <label for="album">Album</label>
-                        <input type="text" class="form-control" id="album"
-                               placeholder="fancy value">
-                    </div>
 
+                <h4>Overrides <span class="text-muted">(Optional)</span></h4>
+
+                <div>
+                    <label for="album">Album</label>
+                    <input type="text" class="form-control" id="album"
+                           placeholder="fancy value">
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </section>
 

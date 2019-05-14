@@ -8,11 +8,14 @@
   box-shadow: none;
 }
 
-#message_pump-off {
-  > div.container {
-    border: 1px solid blue;
-    > div.row {
-      border: 1px solid green;
-    }
-  }
+#message_pump {
+
+}
+
+section {
+  margin-bottom: 1.5rem;
+}
+
+#request_form_container {
+  padding: 0.5rem;
 }
