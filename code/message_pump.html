@@ -14,16 +14,74 @@
 <script src="/static/jquery-3.3.1.min.js"></script>
 <script src="/static/paho-mqtt.js"></script>
 <script src="/static/URI.min.js"></script>
+<script src="/static/mustache.min.js"></script>
+<script src="/static/popper.min.js"></script>
 <script src="/static/bootstrap.min.js"></script>
 <script src="mqtt_glue.js"></script>
 
 <script>
     let my_client = null;
+    let monkey_listener = null;
+    const alert_template = [
+        '<div class="alert alert-{{ kind }}" role="alert">',
+        '{{{ message }}}',
+        '</div>'
+    ].join("");
+
+    let fake_errors = [
+        {},
+        {
+            "message": "Severe error",
+            "may_try_again": false
+        },
+        {
+            "message": "Not so severe error",
+            "may_try_again": true
+        }
+    ];
+
     URI.preventInvalidHostname = true;
+
+    function add_notification(args) {
+        let ni_selector = $('#notification_items');
+        let alerts_selector = ni_selector.find('div.alert');
+        let alerts_threshold = 9;
+
+        if(alerts_selector.length > alerts_threshold) {
+            alerts_selector.slice(alerts_threshold).remove();
+        }
+
+        ni_selector.prepend(Mustache.render(alert_template, args));
+    }
+
+    function callback_notifications(message) {
+        let data = JSON.parse(message.payloadString);
+
+        // console.info(message.topic + ":");
+        // console.info(JSON.stringify(data, null, 2));
+
+        let args = {
+            "kind": "primary",
+            "message": "it's all good man"
+        };
+
+        if (data.error) {
+            args = {
+                "message": data.error.message,
+                "kind": "warning"
+            };
+
+            if(false === data.error.may_try_again) {
+                args["kind"] = "danger"
+            }
+        }
+
+        add_notification(args);
+    }
 
     function on_hit(event) {
         event.preventDefault();
-        console.debug("Hit me baby one more time");
+        // console.debug("Hit me baby one more time");
         let the_url = null;
         let url_selector = $('#url');
         let album_selector = $('#album');
@@ -35,7 +93,12 @@
         }
 
         if (!raw_url_value) {
-            console.error("FUCK!!!!");
+            let args = {
+                "message": "No URL value?",
+                "kind": "warning"
+            };
+            console.error(args.message);
+            add_notification(args);
             return;
         }
 
@@ -46,16 +109,24 @@
             the_url = new URI(raw_url_value);
         }
         catch (e) {
-            console.error("FUCK!");
+            let args = {
+                "message": "Invalid URL",
+                "kind": "error"
+            };
+            console.error(args.message);
+            add_notification(args);
             return;
         }
-
-        console.info(JSON.stringify(the_url, null, 2));
 
         let supported_scheme = (the_url.scheme() == 'http' || the_url.scheme() == 'https');
 
         if (false === supported_scheme) {
-            console.error("FUCKER!");
+            let args = {
+                "message": "Unsupported scheme",
+                "kind": "danger"
+            };
+            console.error(args.message);
+            add_notification(args);
             return;
         }
 
@@ -64,6 +135,12 @@
             "email_notification": $('#email_notification').is(":checked"),
             "overrides": {}
         };
+
+        let randy = Math.floor(Math.random() * 10);
+        let error_item = fake_errors[randy % fake_errors.length];
+        if (false === $.isEmptyObject(error_item)) {
+            payload['error'] = error_item;
+        }
 
         if (override_album) {
             payload['overrides']['album'] = override_album;
@@ -77,7 +154,12 @@
             let message = new Paho.Message(JSON.stringify(payload));
             message.destinationName = "test";
             my_client.send(message);
-            url_selector.val('');
+            let args = {
+                "message": "Added something",
+                "kind": "success"
+            };
+            add_notification(args);
+            // url_selector.val('');
         }
         catch (e) {
             console.error(e);
@@ -89,6 +171,8 @@
         console.log("ready!");
         my_client = add_mqtt_listener("test");
         $("#gimme").on("click", on_hit);
+        monkey_listener = add_mqtt_listener("notifications", callback_notifications);
+        $('[data-toggle="tooltip"]').tooltip()
     });
 </script>
 
@@ -103,7 +187,10 @@
                 <div class="col-md-12">
                     <div class="input-group">
                         <input id="url" type="text" class="form-control"
-                               placeholder="http://bla.org">
+                               placeholder="http://bla.org"
+                               value="http://example.com"
+                               data-toggle="tooltip" data-placement="left" title="Tooltip on right"
+                        >
 
                         <div class="input-group-append">
                             <input id="gimme" type="submit"
@@ -152,5 +239,14 @@
         </div>
     </div>
 </section>
+
+<section id="notifications">
+    <div class="container">
+        <div class="row">
+            <div id="notification_items" class="col-md-12"></div>
+        </div>
+    </div>
+</section>
+
 </body>
 </html>
