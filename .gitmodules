@@ -7,3 +7,6 @@
 [submodule "static/dry/bootstrap"]
 	path = static/dry/bootstrap
 	url = git@github.com:twbs/bootstrap.git
+[submodule "static/dry/mustache"]
+	path = static/dry/mustache
+	url = git@github.com:janl/mustache.js.git
