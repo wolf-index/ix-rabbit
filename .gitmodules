@@ -10,3 +10,6 @@
 [submodule "static/dry/mustache"]
 	path = static/dry/mustache
 	url = git@github.com:janl/mustache.js.git
+[submodule "static/dry/moment_js"]
+	path = static/dry/moment_js
+	url = https://github.com/moment/moment
