@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>ix-rabbit</title>
+    <title>Message Pump Demo</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css"
           type="text/css"/>
     <link rel="stylesheet" href="/static/css/message_pump.css"
@@ -16,29 +16,34 @@
 <script src="/static/URI.min.js"></script>
 <script src="/static/mustache.min.js"></script>
 <script src="/static/popper.min.js"></script>
+<script src="/static/moment.min.js"></script>
 <script src="/static/bootstrap.min.js"></script>
 <script src="mqtt_glue.js"></script>
 
 <script>
     let my_client = null;
     let monkey_listener = null;
+    const DT_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+
     const alert_template = [
         '<div class="alert alert-{{ kind }}" role="alert">',
         '{{{ message }}}',
         '</div>'
     ].join("");
-
-    let fake_errors = [
-        {},
-        {
-            "message": "Severe error",
-            "may_try_again": false
-        },
-        {
-            "message": "Not so severe error",
-            "may_try_again": true
-        }
-    ];
+    const notification_message_template = [
+        '<b>GOT</b>',
+        '{{ dt_string }}',
+        '{{ sensor_id }}/{{ capability_id }}',
+        'with',
+        '{{ values_str }}'
+    ].join(" ");
+    const published_message_template = [
+        '<b>PUB</b>',
+        '{{ dt_string }}',
+        '{{ sensor_id }}/{{ capability_id }}',
+        'with',
+        '{{ values_str }}'
+    ].join(" ");
 
     URI.preventInvalidHostname = true;
 
@@ -60,106 +65,46 @@
         // console.info(message.topic + ":");
         // console.info(JSON.stringify(data, null, 2));
 
+        data['values_str'] = JSON.stringify(data.values);
+        data['dt_string'] = moment.utc(data.publish_dt).format(DT_FORMAT);
+
         let args = {
             "kind": "primary",
-            "message": "it's all good man"
+            "message": Mustache.render(notification_message_template, data)
         };
-
-        if (data.error) {
-            args = {
-                "message": data.error.message,
-                "kind": "warning"
-            };
-
-            if (false === data.error.may_try_again) {
-                args["kind"] = "danger"
-            }
-        }
 
         add_notification(args);
     }
 
     function on_hit(event) {
         event.preventDefault();
-        // console.debug("Hit me baby one more time");
-        let the_url = null;
-        let url_selector = $('#url');
-        let album_selector = $('#album');
-        let raw_url_value = url_selector.val();
-        let override_album = album_selector.val();
-
-        if (override_album) {
-            override_album = override_album.trim();
-        }
-
-        if (!raw_url_value) {
-            let args = {
-                "message": "No URL value?",
-                "kind": "warning"
-            };
-            console.error(args.message);
-            add_notification(args);
-            return;
-        }
-
-        raw_url_value = raw_url_value.trim();
-
-        console.info("'" + raw_url_value + "'");
-        try {
-            the_url = new URI(raw_url_value);
-        }
-        catch (e) {
-            let args = {
-                "message": "Invalid URL",
-                "kind": "error"
-            };
-            console.error(args.message);
-            add_notification(args);
-            return;
-        }
-
-        let supported_scheme = (the_url.scheme() == 'http' || the_url.scheme() == 'https');
-
-        if (false === supported_scheme) {
-            let args = {
-                "message": "Unsupported scheme",
-                "kind": "danger"
-            };
-            console.error(args.message);
-            add_notification(args);
-            return;
-        }
+        let demo_value_selector = $('#a1_gesamtverfahrweg');
 
         let payload = {
-            "url": the_url.toString(),
-            "email_notification": $('#email_notification').is(":checked"),
-            "overrides": {}
+            "sensor_id": "80eb07045af7d7b9",
+            "capability_id": "c8df7e7997e2fb02",
+            "values": [
+                {
+                    "a1_gesamtverfahrweg": demo_value_selector.val()
+                }
+            ]
         };
-
-        let randy = Math.floor(Math.random() * 10);
-        let error_item = fake_errors[randy % fake_errors.length];
-        if (false === $.isEmptyObject(error_item)) {
-            payload['error'] = error_item;
-        }
-
-        if (override_album) {
-            payload['overrides']['album'] = override_album;
-        }
-
-        if (false === $('#keep_override_value').is(":checked")) {
-            album_selector.val('');
-        }
+        let randy = Math.floor(Math.random() * 10) % 10;
+        demo_value_selector.val(randy);
 
         try {
+            let sent_dt_string = moment.utc().format(DT_FORMAT);
             let message = new Paho.Message(JSON.stringify(payload));
             message.destinationName = "test";
             my_client.send(message);
+            // "Published MQTT message to <b>" + message.destinationName + "</b>",
+            payload['values_str'] = JSON.stringify(payload.values);
+            payload['dt_string'] = sent_dt_string;
             let args = {
-                "message": "Added something",
-                "kind": "success"
+                "message": Mustache.render(published_message_template, payload),
+                "kind": "secondary"
             };
             add_notification(args);
-            // url_selector.val('');
         }
         catch (e) {
             console.error(e);
@@ -183,10 +128,11 @@
                 <h1>Message Pump Demo</h1>
 
                 <div class="input-group">
-                    <input id="url" type="text" class="form-control"
-                           placeholder="http://bla.org"
-                           value="http://example.com"
-                           data-toggle="tooltip" data-placement="top" title="Tooltip on right"
+                    <input id="a1_gesamtverfahrweg" type="text"
+                           class="form-control measures_item"
+                           placeholder="1" value="-1"
+                           data-toggle="tooltip" data-placement="top"
+                           title="Tooltip on right"
                     >
 
                     <div class="input-group-append">
@@ -196,6 +142,7 @@
                     </div>
                 </div>
 
+                <!--
                 <hr>
 
                 <div class="custom-control custom-checkbox">
@@ -230,6 +177,7 @@
                     <input type="text" class="form-control" id="album"
                            placeholder="fancy value">
                 </div>
+                -->
             </div>
         </form>
     </div>
